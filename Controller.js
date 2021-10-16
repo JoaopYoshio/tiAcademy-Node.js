@@ -75,6 +75,14 @@ app.post('/itenspedido', async (req, res) => {
     });
 });
 
+app.get('/listaservicos', async(req, res)=> {
+    await servico.findAll({
+        raw: true,
+    }).then(function(servicos){
+        res.json({servicos})
+    });
+});
+
 let port = process.env.PORT || 3001;
 
 app.listen(port, (req, res) => {
