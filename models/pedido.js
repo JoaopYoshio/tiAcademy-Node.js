@@ -1,6 +1,6 @@
 'use strict';
 const {
-  Model
+  Model, ForeignKeyConstraintError
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
   class Pedido extends Model {
@@ -11,10 +11,12 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      Pedido.belongsTo(models.Cliente);
+      Pedido.belongsTo(models.Cliente, {foreignKey: 'ClienteId', as: 'clientes'});
       Pedido.belongsToMany(models.Servico,{
-        through:'ItemPedido'
+        foreignKey:'ServicoId',
+        through: 'ItemPedido', as: 'servico_ped'
       });
+      Pedido.hasMany(models.ItemPedido, {foreignKey: 'PedidoId', as: 'item_pedido'})
     }
   };
   Pedido.init({
