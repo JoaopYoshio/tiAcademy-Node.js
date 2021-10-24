@@ -153,6 +153,13 @@ app.get('/pedidos/:id', async (req, res) => {
         .then(ped => {
             return res.json({ ped });
         });
+});
+
+app.get('/clientes/:id/pedidos', async (req, res) => {
+    await cliente.findByPk(req.params.id, { include: [{ all: true }] })
+        .then(serv => {
+            return res.json({ serv });
+        })
 })
 
 //-----------------------UPDATE--------------------------//
@@ -208,13 +215,6 @@ app.put('/pedidos/:id/editaritem', async (req, res) => {
         })
     });
 });
-
-app.get('/clientes/:id/pedidos', async (req, res) => {
-    await cliente.findByPk(req.params.id, { include: [{ all: true }] })
-        .then(serv => {
-            return res.json({ serv });
-        })
-})
 
 //-----------------------DELETE-------------------------//
 
@@ -309,6 +309,112 @@ app.get('/listaitenscompras', async (req, res) => {
         res.json({ itemcompras })
     });
 });
+
+//-----------------------UPDATE--------------------------//
+
+app.put("/atualizaproduto", async (req, res) => {
+    await produto.update(req.body, {
+        where: { id: req.body.id }
+    }).then(function () {
+        return res.json({
+            error: false,
+            message: "Produto alterado com sucesso"
+        })
+    }).catch(function (erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro na alteração do produto"
+        })
+    })
+});
+
+app.put("/atualizacompra", async (req, res) => {
+    await compra.update(req.body, {
+        where: { id: req.body.id }
+    }).then(function () {
+        return res.json({
+            error: false,
+            message: "Compra alterado com sucesso"
+        })
+    }).catch(function (erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro na alteração da Compra"
+        })
+    })
+});
+
+app.put('/compras/:id/editaritem', async (req, res) => {
+    const item = {
+        quantidade: req.body.quantidade,
+        valor: req.body.valor
+    };
+
+    if (!await compra.findByPk(req.params.id)) {
+        return res.status(400).json({
+            error: true,
+            message: "Compra não encontrado"
+        })
+    }
+    if (!await produto.findByPk(req.body.ProdutoId)) {
+        return res.status(400).json({
+            error: true,
+            message: "Produto não encontrado"
+        })
+    }
+    await itemcompra.update(item, {
+        where: Sequelize.and({ ProdutoId: req.body.ProdutoId },
+            { CompraId: req.params.id })
+    }).then(function (itens) {
+        return res.json({
+            error: false,
+            message: "Item da compra alterado com sucesso!",
+            itens
+
+        });
+    }).catch(function (erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro: não foi possível alterar."
+        })
+    });
+});
+
+//-----------------------DELETE-------------------------//
+
+app.get('/excluircompra/:id', async(req, res)=>{
+    await compra.destroy({
+       where: {id: req.params.id}
+   }).then(function(){
+       return res.json({
+           error:false, 
+           message: "Compra foi excluído com sucesso!"
+       });
+   }).catch(function(erro){
+       return res.status(400).json({
+           error:true,
+           message: "Erro ao excluir a compra"
+       })
+   })
+});
+
+
+app.get('/excluirproduto/:id', async(req, res)=>{
+    await produto.destroy({
+       where: {id: req.params.id}
+   }).then(function(){
+       return res.json({
+           error:false, 
+           message: "Produto foi excluído com sucesso!"
+       });
+   }).catch(function(erro){
+       return res.status(400).json({
+           error:true,
+           message: "Erro ao excluir o produto"
+       })
+   })
+});
+
 
 let port = process.env.PORT || 3001;
 
