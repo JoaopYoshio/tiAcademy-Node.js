@@ -14,24 +14,16 @@ let itempedido = models.ItemPedido;
 let pedido = models.Pedido;
 let servico = models.Servico;
 
+let compra = models.Compra;
+let itemcompra = models.ItemCompra;
+let produto = models.Produto;
+
 app.get('/', function (req, res) {
     res.send("Hello World!!")
 });
 
-app.post('/servicos', async (req, res) => {
-    await servico.create(req.body
-    ).then(function () {
-        return res.json({
-            error: false,
-            message: "Serviço criado com sucesso!"
-        })
-    }).catch(function (error) {
-        return res.status(400).json({
-            error: true,
-            message: "Foi impossível se conectar."
-        })
-    });
-});
+//-----------------------CREATE--------------------------//
+
 app.post('/clientes', async (req, res) => {
     await cliente.create(req.body
     ).then(function () {
@@ -62,6 +54,21 @@ app.post('/pedidos', async (req, res) => {
     });
 });
 
+app.post('/servicos', async (req, res) => {
+    await servico.create(req.body
+    ).then(function () {
+        return res.json({
+            error: false,
+            message: "Serviço criado com sucesso!"
+        })
+    }).catch(function (error) {
+        return res.status(400).json({
+            error: true,
+            message: "Foi impossível se conectar."
+        })
+    });
+});
+
 app.post('/itenspedido', async (req, res) => {
     await itempedido.create(req.body
     ).then(function () {
@@ -77,20 +84,22 @@ app.post('/itenspedido', async (req, res) => {
     });
 });
 
-app.get('/listaservicos', async (req, res) => {
-    await servico.findAll({
-        //raw: true,
-        order: [['nome', 'ASC']]
-    }).then(function (servicos) {
-        res.json({ servicos })
-    });
-});
+//-----------------------LIST--------------------------//
 
 app.get('/listaclientes', async (req, res) => {
     await cliente.findAll({
         order: [['createdAt', 'ASC']]//ordem de antiguidade
     }).then(function (clientes) {
         res.json({ clientes })
+    });
+});
+
+app.get('/listaservicos', async (req, res) => {
+    await servico.findAll({
+        //raw: true,
+        order: [['nome', 'ASC']]
+    }).then(function (servicos) {
+        res.json({ servicos })
     });
 });
 
@@ -102,11 +111,7 @@ app.get('/listaitenspedidos', async (req, res) => {
     });
 });
 
-app.get('/servicosbase', async (req, res) => {
-    await servico.count('id').then(function (servicos) {//conta o número de ids
-        res.json({ servicos });
-    });
-});
+//-----------------------COUNT--------------------------//
 
 app.get('/clientesbase', async (req, res) => {
     await cliente.count('id').then(function (clientes) {
@@ -119,6 +124,14 @@ app.get('/pedidosbase', async (req, res) => {
         res.json({ pedidos });
     });
 });
+
+app.get('/servicosbase', async (req, res) => {
+    await servico.count('id').then(function (servicos) {//conta o número de ids
+        res.json({ servicos });
+    });
+});
+
+//-----------------------SEARCH--------------------------//
 
 app.get('/servico/:id', async (req, res) => {
     await servico.findByPk(req.params.id)
@@ -135,6 +148,15 @@ app.get('/servico/:id', async (req, res) => {
         });
 });
 
+app.get('/pedidos/:id', async (req, res) => {
+    await pedido.findByPk(req.params.id, { include: [{ all: true }] })
+        .then(ped => {
+            return res.json({ ped });
+        });
+})
+
+//-----------------------UPDATE--------------------------//
+
 app.put("/atualizaservico", async (req, res) => {
     await servico.update(req.body, {
         where: { id: req.body.id }
@@ -150,13 +172,6 @@ app.put("/atualizaservico", async (req, res) => {
         })
     })
 });
-
-app.get('/pedidos/:id', async (req, res) => {
-    await pedido.findByPk(req.params.id, { include: [{ all: true }] })
-        .then(ped => {
-            return res.json({ ped });
-        })
-})
 
 app.put('/pedidos/:id/editaritem', async (req, res) => {
     const item = {
@@ -201,6 +216,8 @@ app.get('/clientes/:id/pedidos', async (req, res) => {
         })
 })
 
+//-----------------------DELETE-------------------------//
+
 app.get('/excluircliente/:id', async(req, res)=>{
      await cliente.destroy({
         where: {id: req.params.id}
@@ -217,8 +234,85 @@ app.get('/excluircliente/:id', async(req, res)=>{
     })
 });
 
+//-----------------------DESAFIO-------------------------//
+
+//-----------------------CREATE--------------------------//
+
+app.post('/compras', async (req, res) => {
+    await compra.create(req.body
+    ).then(function () {
+        return res.json({
+            error: false,
+            message: "Compra criado com sucesso!"
+        })
+    }).catch(function (error) {
+        return res.status(400).json({
+            error: true,
+            message: "Foi impossível se conectar."
+        })
+    });
+});
+
+app.post('/produtos', async (req, res) => {
+    await produto.create(req.body
+    ).then(function () {
+        return res.json({
+            error: false,
+            message: "Produto criado com sucesso!"
+        })
+    }).catch(function (error) {
+        return res.status(400).json({
+            error: true,
+            message: "Foi impossível se conectar."
+        })
+    });
+});
+
+app.post('/itenscompra', async (req, res) => {
+    await itemcompra.create(req.body
+    ).then(function () {
+        return res.json({
+            error: false,
+            message: "Item criado com sucesso"
+        })
+    }).catch(function (error) {
+        return res.status(400).json({
+            error: true,
+            message: "Foi impossível se conectar."
+        })
+    });
+});
+
+//-----------------------LIST--------------------------//
+
+app.get('/listascompras', async (req, res) => {
+    await compra.findAll({
+        order: [['id', 'ASC']]
+    }).then(function (compras) {
+        res.json({ compras })
+    });
+});
+
+app.get('/listasprodutos', async (req, res) => {
+    await produto.findAll({
+        //raw: true,
+        order: [['nome', 'ASC']]
+    }).then(function (produtos) {
+        res.json({ produtos })
+    });
+});
+
+app.get('/listaitenscompras', async (req, res) => {
+    await itemcompra.findAll({
+        order: [['valor', 'DESC']]//ordem de maior valor
+    }).then(function (itemcompras) {
+        res.json({ itemcompras })
+    });
+});
+
 let port = process.env.PORT || 3001;
 
 app.listen(port, (req, res) => {
     console.log("Servidor ativo: http://localhost:3001");
 })
+
