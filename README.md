@@ -1,2 +1,2 @@
 # tiAcademy-Node.js 3ª semana
-Repositório para o armazenar desafios e exercicíos da tiAcademy Ciclo 3
+Repositório para armazenar os códigos do back-end do CRUD
