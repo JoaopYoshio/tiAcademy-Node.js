@@ -148,6 +148,22 @@ app.get('/servico/:id', async (req, res) => {
         });
 });
 
+app.get('/servico/:id/pedidos', async (req, res) => {
+    await itempedido.findAll({
+        where: {ServicoId: req.params.id}})
+        .then(item => {
+            return res.json({
+                error: false,
+                item
+            });
+        }).catch(function (erro) {
+            return res.status(400).json({
+                error: true,
+                message: "Erro: Não foi posssível se conectar!"
+            });
+        });
+});
+
 app.get('/pedidos/:id', async (req, res) => {
     await pedido.findByPk(req.params.id, { include: [{ all: true }] })
         .then(ped => {
