@@ -94,10 +94,18 @@ app.get('/listaclientes', async (req, res) => {
     });
 });
 
+app.get('/listapedidos', async (req, res) => {
+    await pedido.findAll({
+        order: [['id', 'ASC']]
+    }).then(function (pedidos) {
+        res.json({ pedidos })
+    });
+});
+
 app.get('/listaservicos', async (req, res) => {
     await servico.findAll({
         //raw: true,
-        order: [['nome', 'ASC']]
+        order: [['id', 'ASC']]
     }).then(function (servicos) {
         res.json({ servicos })
     });
