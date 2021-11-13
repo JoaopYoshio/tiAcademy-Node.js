@@ -172,6 +172,19 @@ app.get('/servico/:id/pedidos', async (req, res) => {
         });
 });
 
+app.get('/cliente/:id', async (req, res) => {
+    await cliente.findByPk(req.params.id)
+        .then(cli => {
+            return res.json({ cli });
+        }).catch(function (erro) {
+            return res.status(400).json({
+                error: true,
+                message: "Erro!!"
+            });
+        });
+});
+
+
 app.get('/pedidos/:id', async (req, res) => {
     await pedido.findByPk(req.params.id, { include: [{ all: true }] })
         .then(ped => {
@@ -181,27 +194,71 @@ app.get('/pedidos/:id', async (req, res) => {
 
 app.get('/clientes/:id/pedidos', async (req, res) => {
     await cliente.findByPk(req.params.id, { include: [{ all: true }] })
-        .then(serv => {
-            return res.json({ serv });
+        .then(peds => {
+            return res.json({ peds });
         })
 })
 
 //-----------------------UPDATE--------------------------//
 
-app.put("/atualizaservico", async (req, res) => {
-    await servico.update(req.body, {
-        where: { id: req.body.id }
+app.put("/servico/:id/editar", async (req, res) => {
+    if(!await servico.findByPk(req.params.id)) {
+        return res.status(400).json({
+            erro: true,
+            message: "Serviço não encontrado."
+        });
+    };
+
+    const serv = {
+        nome: req.body.nome,
+        descricao: req.body.descricao
+    }
+
+    await servico.update(serv, {
+        where: {id: req.params.id}
+    }).then(function() {
+        return res.json({
+            error: false,
+            message: "Serviço alterado com sucesso!"
+        });
+    }).catch(function(erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro ao alterar o serviço."
+        });
+    });
+});
+
+app.put('/cliente/:id/editar', async (req, res) => {
+    const cli = {
+        nome: req.body.nome,
+        endereco: req.body.endereco,
+        cidade: req.body.cidade,
+        uf: req.body.uf,
+        nascimento: req.body.nascimento,
+        clienteDesde: req.body.clienteDesde
+    };
+
+    if (!await pedido.findByPk(req.params.id)) {
+        return res.status(400).json({
+            error: true,
+            message: "Cliente não encontrado"
+        })
+    }
+    await cliente.update(cli, {
+        where: {id: req.params.id}
     }).then(function () {
         return res.json({
             error: false,
-            message: "Serviço alterado com sucesso"
-        })
+            message: "Cliente alterado com sucesso!",
+
+        });
     }).catch(function (erro) {
         return res.status(400).json({
             error: true,
-            message: "Erro na alteração do serviço"
+            message: "Erro: não foi possível alterar."
         })
-    })
+    });
 });
 
 app.put('/pedidos/:id/editaritem', async (req, res) => {
@@ -242,7 +299,7 @@ app.put('/pedidos/:id/editaritem', async (req, res) => {
 
 //-----------------------DELETE-------------------------//
 
-app.get('/excluircliente/:id', async(req, res)=>{
+app.delete('/excluircliente/:id', async(req, res)=>{
      await cliente.destroy({
         where: {id: req.params.id}
     }).then(function(){
