@@ -158,7 +158,8 @@ app.get('/servico/:id', async (req, res) => {
 
 app.get('/servico/:id/pedidos', async (req, res) => {
     await itempedido.findAll({
-        where: {ServicoId: req.params.id}})
+        where: { ServicoId: req.params.id }
+    })
         .then(item => {
             return res.json({
                 error: false,
@@ -192,17 +193,28 @@ app.get('/pedidos/:id', async (req, res) => {
         });
 });
 
-app.get('/clientes/:id/pedidos', async (req, res) => {
-    await cliente.findByPk(req.params.id, { include: [{ all: true }] })
-        .then(peds => {
-            return res.json({ peds });
+app.get('/cliente/:id/pedidos', async (req, res) => {
+    await pedido.findAll({
+        where: { ClienteId: req.params.id }
+    })
+    .then(peds => {
+            return res.json({
+                error: false,
+                peds
+            });
+    })
+    .catch(erro => {
+        return res.status(400).json({
+            error: true,
+            message: "Não foi possível retornar os pedidos!"
         })
+    })
 })
 
 //-----------------------UPDATE--------------------------//
 
 app.put("/servico/:id/editar", async (req, res) => {
-    if(!await servico.findByPk(req.params.id)) {
+    if (!await servico.findByPk(req.params.id)) {
         return res.status(400).json({
             erro: true,
             message: "Serviço não encontrado."
@@ -215,13 +227,13 @@ app.put("/servico/:id/editar", async (req, res) => {
     }
 
     await servico.update(serv, {
-        where: {id: req.params.id}
-    }).then(function() {
+        where: { id: req.params.id }
+    }).then(function () {
         return res.json({
             error: false,
             message: "Serviço alterado com sucesso!"
         });
-    }).catch(function(erro) {
+    }).catch(function (erro) {
         return res.status(400).json({
             error: true,
             message: "Erro ao alterar o serviço."
@@ -246,7 +258,7 @@ app.put('/cliente/:id/editar', async (req, res) => {
         })
     }
     await cliente.update(cli, {
-        where: {id: req.params.id}
+        where: { id: req.params.id }
     }).then(function () {
         return res.json({
             error: false,
@@ -299,18 +311,34 @@ app.put('/pedidos/:id/editaritem', async (req, res) => {
 
 //-----------------------DELETE-------------------------//
 
-app.delete('/excluircliente/:id', async(req, res)=>{
-     await cliente.destroy({
-        where: {id: req.params.id}
-    }).then(function(){
+app.delete('/excluircliente/:id', async (req, res) => {
+    await cliente.destroy({
+        where: { id: req.params.id }
+    }).then(function () {
         return res.json({
-            error:false, 
+            error: false,
             message: "Cliente foi excluído com sucesso!"
         });
-    }).catch(function(erro){
+    }).catch(function (erro) {
         return res.status(400).json({
-            error:true,
+            error: true,
             message: "Erro ao excluir o cliente"
+        })
+    })
+});
+
+app.delete('/excluirpedido/:id', async (req, res) => {
+    await pedido.destroy({
+        where: { id: req.params.id }
+    }).then(function () {
+        return res.json({
+            error: false,
+            message: "Pedido foi excluído com sucesso!"
+        });
+    }).catch(function (erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro ao excluir o pedido"
         })
     })
 });
@@ -463,37 +491,37 @@ app.put('/compras/:id/editaritem', async (req, res) => {
 
 //-----------------------DELETE-------------------------//
 
-app.get('/excluircompra/:id', async(req, res)=>{
+app.get('/excluircompra/:id', async (req, res) => {
     await compra.destroy({
-       where: {id: req.params.id}
-   }).then(function(){
-       return res.json({
-           error:false, 
-           message: "Compra foi excluído com sucesso!"
-       });
-   }).catch(function(erro){
-       return res.status(400).json({
-           error:true,
-           message: "Erro ao excluir a compra"
-       })
-   })
+        where: { id: req.params.id }
+    }).then(function () {
+        return res.json({
+            error: false,
+            message: "Compra foi excluído com sucesso!"
+        });
+    }).catch(function (erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro ao excluir a compra"
+        })
+    })
 });
 
 
-app.get('/excluirproduto/:id', async(req, res)=>{
+app.get('/excluirproduto/:id', async (req, res) => {
     await produto.destroy({
-       where: {id: req.params.id}
-   }).then(function(){
-       return res.json({
-           error:false, 
-           message: "Produto foi excluído com sucesso!"
-       });
-   }).catch(function(erro){
-       return res.status(400).json({
-           error:true,
-           message: "Erro ao excluir o produto"
-       })
-   })
+        where: { id: req.params.id }
+    }).then(function () {
+        return res.json({
+            error: false,
+            message: "Produto foi excluído com sucesso!"
+        });
+    }).catch(function (erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro ao excluir o produto"
+        })
+    })
 });
 
 
