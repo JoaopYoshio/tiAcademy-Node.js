@@ -211,6 +211,24 @@ app.get('/cliente/:id/pedidos', async (req, res) => {
     })
 })
 
+app.get('/cliente/:id/compras', async (req, res) => {
+    await compra.findAll({
+        where: { ClienteId: req.params.id }
+    })
+    .then(compras => {
+            return res.json({
+                error: false,
+                compras
+            });
+    })
+    .catch(erro => {
+        return res.status(400).json({
+            error: true,
+            message: "Não foi possível retornar as compras!"
+        })
+    })
+})
+
 //-----------------------UPDATE--------------------------//
 
 app.put("/servico/:id/editar", async (req, res) => {
