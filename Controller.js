@@ -269,7 +269,7 @@ app.put('/cliente/:id/editar', async (req, res) => {
         clienteDesde: req.body.clienteDesde
     };
 
-    if (!await pedido.findByPk(req.params.id)) {
+    if (!await cliente.findByPk(req.params.id)) {
         return res.status(400).json({
             error: true,
             message: "Cliente não encontrado"
