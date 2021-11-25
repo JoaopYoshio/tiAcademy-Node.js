@@ -185,6 +185,19 @@ app.get('/cliente/:id', async (req, res) => {
         });
 });
 
+app.get('/pedido/:id', async (req, res) => {
+    await pedido.findByPk(req.params.id)
+        .then(ped => {
+            return res.json({ ped });
+        }).catch(function (erro) {
+            return res.status(400).json({
+                error: true,
+                message: "Erro!!"
+            });
+        });
+});
+
+
 
 app.get('/pedidos/:id', async (req, res) => {
     await pedido.findByPk(req.params.id, { include: [{ all: true }] })
@@ -255,6 +268,33 @@ app.put("/servico/:id/editar", async (req, res) => {
         return res.status(400).json({
             error: true,
             message: "Erro ao alterar o serviço."
+        });
+    });
+});
+
+app.put("/pedido/:id/editar", async (req, res) => {
+    if (!await pedido.findByPk(req.params.id)) {
+        return res.status(400).json({
+            erro: true,
+            message: "Serviço não encontrado."
+        });
+    };
+
+    const ped = {
+        data: req.body.data
+    }
+
+    await pedido.update(ped, {
+        where: { id: req.params.id }
+    }).then(function () {
+        return res.json({
+            error: false,
+            message: "Pedido alterado com sucesso!"
+        });
+    }).catch(function (erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro ao alterar o pedido."
         });
     });
 });
@@ -361,6 +401,38 @@ app.delete('/excluirpedido/:id', async (req, res) => {
     })
 });
 
+app.delete('/excluirservico/:id', async (req, res) => {
+    await servico.destroy({
+        where: { id: req.params.id }
+    }).then(function () {
+        return res.json({
+            error: false,
+            message: "Pedido foi excluído com sucesso!"
+        });
+    }).catch(function (erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro ao excluir o pedido"
+        })
+    })
+});
+
+app.delete('/excluiritempedido/:id', async (req, res) => {
+    await itempedido.destroy({
+        where: { id: req.params.id }
+    }).then(function () {
+        return res.json({
+            error: false,
+            message: "Pedido foi excluído com sucesso!"
+        });
+    }).catch(function (erro) {
+        return res.status(400).json({
+            error: true,
+            message: "Erro ao excluir o pedido"
+        })
+    })
+});
+
 //-----------------------DESAFIO-------------------------//
 
 //-----------------------CREATE--------------------------//
@@ -439,37 +511,34 @@ app.get('/listaitenscompras', async (req, res) => {
 
 //-----------------------UPDATE--------------------------//
 
-app.put("/atualizaproduto", async (req, res) => {
-    await produto.update(req.body, {
-        where: { id: req.body.id }
+app.put("/produto/:id/editar", async (req, res) => {
+    if (!await produto.findByPk(req.params.id)) {
+        return res.status(400).json({
+            erro: true,
+            message: "Produto não encontrado."
+        });
+    };
+
+    const prod = {
+        nome: req.body.nome,
+        descricao: req.body.descricao
+    }
+
+    await produto.update(prod, {
+        where: { id: req.params.id }
     }).then(function () {
         return res.json({
             error: false,
-            message: "Produto alterado com sucesso"
-        })
+            message: "Serviço alterado com sucesso!"
+        });
     }).catch(function (erro) {
         return res.status(400).json({
             error: true,
-            message: "Erro na alteração do produto"
-        })
-    })
+            message: "Erro ao alterar o serviço."
+        });
+    });
 });
 
-app.put("/atualizacompra", async (req, res) => {
-    await compra.update(req.body, {
-        where: { id: req.body.id }
-    }).then(function () {
-        return res.json({
-            error: false,
-            message: "Compra alterado com sucesso"
-        })
-    }).catch(function (erro) {
-        return res.status(400).json({
-            error: true,
-            message: "Erro na alteração da Compra"
-        })
-    })
-});
 
 app.put('/compras/:id/editaritem', async (req, res) => {
     const item = {
@@ -506,10 +575,27 @@ app.put('/compras/:id/editaritem', async (req, res) => {
         })
     });
 });
+//-----------------------SEARCH-------------------------//
+
+app.get('/produto/:id', async (req, res) => {
+    await produto.findByPk(req.params.id)
+        .then(prod => {
+            return res.json({
+                error: false,
+                prod
+            });
+        }).catch(function (erro) {
+            return res.status(400).json({
+                error: true,
+                message: "Erro: Serviço não encontrado"
+            });
+        });
+});
+
 
 //-----------------------DELETE-------------------------//
 
-app.get('/excluircompra/:id', async (req, res) => {
+app.delete('/excluircompra/:id', async (req, res) => {
     await compra.destroy({
         where: { id: req.params.id }
     }).then(function () {
@@ -526,7 +612,7 @@ app.get('/excluircompra/:id', async (req, res) => {
 });
 
 
-app.get('/excluirproduto/:id', async (req, res) => {
+app.delete('/excluirproduto/:id', async (req, res) => {
     await produto.destroy({
         where: { id: req.params.id }
     }).then(function () {
